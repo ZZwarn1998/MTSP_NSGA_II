@@ -16,11 +16,12 @@ class GA:
         Qi = Population(gm.get_value('size'))
 
         # Crossover
-        for i in range(0, gm.get_value('size'), 2):
+        for i in range(0, gm.get_value('size')):
             PA = cls.binaryTournamentSelection(Pi)
             PB = cls.binaryTournamentSelection(Pi)
             child1 = cls.crossover_COMBINED_HGA(PA, PB, 1)
             child2 = cls.crossover_COMBINED_HGA(PA, PB, 2)
+            # child2 = cls.crossover_COMBINED_HGA(PA, PB, 2)
 
             Qi.saveChromosome(i, child1)
             Qi.saveChromosome(i + 1, child2)
@@ -163,7 +164,7 @@ class GA:
         tournament = Population(tSize)
 
         for index in range(tSize):
-            randomInt = random.randint(0, pop.sizeOfPop - 1)
+            randomInt = random.randint(0, pop.sizeOfPop)
             tournament.saveChromosome(index, pop.getChromosome(randomInt))
 
         best = tournament.getBestChromosome()
@@ -176,13 +177,12 @@ class GA:
             pa2 = PA.getpart2()
             pb1 = PB.getpart1()
             pb2 = PB.getpart2()
-            MARK = "former"
+            MARK = "latter"
             child = cls.crossover_1(pa1, pa2, pb1, pb2, MARK)
-
         else:
             decodePA = PA.getdecode()
             decodePB = PB.getdecode()
-            MARK = "former"
+            MARK = "latter"
             childbefore = cls.crossover_2(decodePA, decodePB, MARK)
             child = cls.rationalization(childbefore)
         return child
@@ -198,11 +198,12 @@ class GA:
         childp1.append(k)
         while (length > 1):
             if MARK == "latter":
-                if pa1.index(k) == gm.get_value("n"):
+                # print(pa1,k)
+                if pa1.index(k) == len(pa1) - 1:
                     x = pa1[0]
                 else:
                     x = pa1[pa1.index(k) + 1]
-                if pb1.index(k) == gm.get_value("n"):
+                if pb1.index(k) == len(pa1) - 1:
                     y = pb1[0]
                 else:
                     y = pb1[pb1.index(k) + 1]
@@ -251,8 +252,14 @@ class GA:
         childseq.append(k)
         while (length > 1):
             if MARK == "latter":
-                x = pa1[pa1.index(k) + 1]
-                y = pb1[pb1.index(k) + 1]
+                if pa1.index(k) == len(pa1) - 1:
+                    x = pa1[0]
+                else:
+                    x = pa1[pa1.index(k) + 1]
+                if pb1.index(k) == len(pa1) - 1:
+                    y = pb1[0]
+                else:
+                    y = pb1[pb1.index(k) + 1]
             elif MARK == "former":
                 if pa1.index(k) == 0:
                     x = pa1[-1]
@@ -289,38 +296,106 @@ class GA:
         copychild = copy.deepcopy(child)
         p1 = []
         p2 = []
+
+        # [ ... 0(First) ... ] ---> [0(First) ... ]
         for i in range(step):
             copychild.insert(len(copychild), copychild[0])
             copychild.remove(copychild[0])
 
-        if cls.judgeIfRationalized(copychild):
-            # Sequence has been rationalized
-            numBehindZero = []
-            for index in range(1, len(copychild) - 1):
-                if copychild[index] == 0:
-                    numBehindZero.append(copychild[index + 1])
+        # [0 ... 0 ... 0 ... 0 ... 0 ... ]
+        # [0 ... 00 ... 00 ... ]
+        # [000 ... 0 ... 0 ... ]
 
-            while 0 in copychild:
-                copychild.remove(0)
-            p1 = copy.deepcopy(copychild)
-            for num in numBehindZero:
-                p2.append(copychild.index(num))
-            # print("p1", p1)
-            # print("p2", p2)
-            child = chromosome(p1, p2)
-            return child
+        seq = copy.deepcopy(copychild)
+        loc = []
+        subseq = []
+        subseqlen = []
+        start = 0
+        end = len(seq)
+        cnt = 0
 
+        # while (0 in seq[start + 1:end]):
+        #     try:
+        #         loc.append(seq.index(0, start + 1, end))
+        #         start = child.index(0, start + 1, end)
+        #     except ValueError:
+        #         print("break!")
+
+        while 0 in seq[start :end]:
+            try:
+                # print(start, end)
+                loc.append(seq.index(0, start, end))
+                start = seq.index(0, start, end) + 1
+
+            except ValueError:
+                # start = len(seq)
+                print("there is no zero.")
+                break
+
+        # loc.insert(0,0)
+        loc.insert(len(seq),len(seq))
+
+        for i in range(0, len(loc) - 1):
+            s = copy.deepcopy(seq[loc[i]+1:loc[i+1]])
+            subseqlen.append(len(s))
+            subseq.append(s)
+
+        while 0 in seq:
+            seq.remove(0)
+
+        if 0 in subseqlen:
+            for l in subseqlen:
+                if l == 0:
+                   cnt = cnt + 1
+            for index,l in enumerate(subseqlen):
+                if l > cnt:
+                   subseqlen[index] = l - cnt
+                elif l == 0 :
+                   subseqlen[index] = 1
+            sum = subseqlen[0]
+            for i in subseqlen[1:len(subseqlen)]:
+                p2.append(sum)
+                sum = sum + i
+            p1 = seq
         else:
-            '''
-                这里与论文内容不符合
-            '''
-            while (0 in copychild):
-                copychild.remove(0)
-            p1 = copy.deepcopy(copychild)
-            p2 = sorted(random.sample(range(1, gm.get_value('n')), gm.get_value('m') - 1))
+            p1 = seq
+            p2 = loc[1:len(loc)-1]
+        '''
+                if cls.judgeIfRationalized(copychild):
+                    # Sequence has been rationalized
+                    numBehindZero = []
+                    for index in range(1, len(copychild) - 1):
+                        if copychild[index] == 0:
+                            numBehindZero.append(copychild[index + 1])
 
-            child = chromosome(p1, p2)
-            return child
+                    while 0 in copychild:
+                        copychild.remove(0)
+                    p1 = copy.deepcopy(copychild)
+                    for num in numBehindZero:
+                        p2.append(copychild.index(num))
+                    # print("p1", p1)
+                    # print("p2", p2)
+                    child = chromosome(p1, p2)
+                    return child
+
+                else:
+
+                        # 这里与论文内容不符合
+
+                    # while (0 in copychild):
+                    #     copychild.remove(0)
+                    # p1 = copy.deepcopy(copychild)
+                    # p2 = sorted(random.sample(range(1, gm.get_value('n')), gm.get_value('m') - 1))
+
+
+                    child = chromosome(p1, p2)
+                '''
+
+
+        child = chromosome(p1, p2)
+        return child
+
+
 
     @classmethod
     def judgeIfRationalized(cls, child):

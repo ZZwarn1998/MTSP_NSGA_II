@@ -35,7 +35,7 @@ def init(filename):
     # Number of distance calculations of pairwise cities
     gm.set_value("cons", 20000*N)
     # Independent runs
-    gm.set_value("runs", 30)
+    gm.set_value("runs", 200)
     # SeedValue
     gm.set_value("seedvalue", 1)
     # Tournament size
@@ -49,7 +49,7 @@ def init(filename):
 
 
 if __name__ == "__main__":
-    filename = "pr226"
+    filename = "mtsp51"
     init(filename)
     pop = Population(gm.get_value('size'))
 
