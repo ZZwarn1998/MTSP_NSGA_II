@@ -66,11 +66,11 @@ if __name__ == "__main__":
     solution_summary = {}
     solution_detail = {}
     for data_name in filename:
+        init(data_name, m, populationSize, coeOfDisCal, generation, seedValue, tournamentSize, mutationRate)
         path_solution = []
         optimal_solution = []
         run_time = []
         for round in range(30):
-            init(data_name, m, populationSize, coeOfDisCal, generation, seedValue, tournamentSize, mutationRate)
             pop = [Chromosome(randomly_generate()) for i in range(0, gm.get_value("popSize"))]
             runtime, best, f1valbest, f2valbest, number, minfun1val_per_round, minfun2val_per_round = GA.start(pop)
             dis_list = []
