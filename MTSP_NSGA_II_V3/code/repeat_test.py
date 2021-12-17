@@ -1,7 +1,5 @@
 from ga import GA
-import numpy as np
 import json
-import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
