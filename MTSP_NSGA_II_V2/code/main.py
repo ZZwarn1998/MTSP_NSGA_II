@@ -58,7 +58,7 @@ if __name__ == "__main__":
     generation = 200
     seedValue = 1
     tournamentSize = 2
-    mutationRate = 0.1
+    mutationRate = 1
 
     # import data and initialize global parameters
     init(filename, m, populationSize, coeOfDisCal, generation, seedValue, tournamentSize, mutationRate)

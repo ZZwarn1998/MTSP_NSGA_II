@@ -3,6 +3,7 @@ import globalManager as gm
 from nodeManager import nodeManager
 import copy
 
+
 class Chromosome:
     def __init__(self, gen):
         self.gen = gen

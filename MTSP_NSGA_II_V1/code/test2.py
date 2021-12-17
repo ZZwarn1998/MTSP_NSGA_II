@@ -65,8 +65,8 @@ def crossover_1(pa1, pa2, pb1, pb2, MARK):
         nodek = nodeManager.getNode(k)
         nodex = nodeManager.getNode(x)
         nodey = nodeManager.getNode(y)
-        dx = nodek.distanceTo(nodex)
-        dy = nodek.distanceTo(nodey)
+        dx = nodek.distance_to(nodex)
+        dy = nodek.distance_to(nodey)
         if dx < dy:
             k = x
         else:
@@ -106,8 +106,8 @@ def crossover_2(pa1, pb1, MARK):
         nodek = nodeManager.getNode(k)
         nodex = nodeManager.getNode(x)
         nodey = nodeManager.getNode(y)
-        dx = nodek.distanceTo(nodex)
-        dy = nodek.distanceTo(nodey)
+        dx = nodek.distance_to(nodex)
+        dy = nodek.distance_to(nodey)
         if dx < dy:
             k = x
         else:

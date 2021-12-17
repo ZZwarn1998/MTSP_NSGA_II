@@ -4,11 +4,13 @@ import globalManager as gm
 from nodeManager import nodeManager as nm
 from chromosome import Chromosome
 import random
+import math
 
 
 class GA:
     
     @classmethod
+
     def start(cls, Pi):
         print("START!")
         start_time = time.time()
@@ -127,7 +129,7 @@ class GA:
     def calDistance(cls, fromindex, toindex):
         nodefrom = nm.getNode(fromindex)
         nodeto = nm.getNode(toindex)
-        return nodefrom.distanceTo(nodeto)
+        return nodefrom.distance_to(nodeto)
     
     @classmethod
     def fast_non_dominated_sort(cls, f1val, f2val):
@@ -181,16 +183,27 @@ class GA:
         distance = [0 for i in range(0, len(front))]
         sorted1 = cls.sort_by_val(front, f1val[:])
         sorted2 = cls.sort_by_val(front, f2val[:])
-        distance[0] = 4444444444444444
-        distance[len(front) - 1] = 4444444444444444
+        distance[0] = math.inf
+        distance[len(front) - 1] = math.inf
+        # print(f1val)
+        # print(f2val)
+        flag = (not math.isclose(max(f1val), min(f1val), rel_tol=1e-5)) and \
+               (not math.isclose(max(f2val), min(f2val), rel_tol=1e-5))
+
         for k in range(1, len(front) - 1):
-            distance[k] = distance[k] + (
-                    f1val[sorted1[k + 1]] - f2val[sorted1[k - 1]]
-            ) / (max(f1val) - min(f1val))
+            if flag:
+                distance[k] = distance[k] + (
+                        f1val[sorted1[k + 1]] - f2val[sorted1[k - 1]]
+                ) / (max(f1val) - min(f1val))
+            else:
+                distance[k] = math.inf
         for k in range(1, len(front) - 1):
-            distance[k] = distance[k] + (
-                    f1val[sorted2[k + 1]] - f2val[sorted2[k - 1]]
-            ) / (max(f2val) - min(f2val))
+            if flag:
+                distance[k] = distance[k] + (
+                        f1val[sorted2[k + 1]] - f2val[sorted2[k - 1]]
+                ) / (max(f2val) - min(f2val))
+            else:
+                distance[k] = math.inf
         return distance
 
     # ！
@@ -211,12 +224,17 @@ class GA:
 
     @classmethod
     def generateChild(cls, parent1, parent2):
-        r = random.random()
+        mr = random.random()
         childseq = cls.getCrossChildSeq(parent1, parent2)
-        if r > 0.5:
-            return Chromosome(cls.mutation1(childseq))
-        else:
-            return Chromosome(cls.mutation2(childseq))
+        if mr < gm.get_value("mr"):
+            r = random.random()
+
+            if r > 0.5:
+                return Chromosome(cls.mutation1(childseq))
+            else:
+                return Chromosome(cls.mutation2(childseq))
+        return Chromosome(childseq)
+
 
     @classmethod
     def getCrossChildSeq(cls, PA, PB):

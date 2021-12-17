@@ -224,8 +224,8 @@ class GA:
             nodex = nodeManager.getNode(x)
             nodey = nodeManager.getNode(y)
 
-            dx = nodek.distanceTo(nodex)
-            dy = nodek.distanceTo(nodey)
+            dx = nodek.distance_to(nodex)
+            dy = nodek.distance_to(nodey)
             if dx < dy:
                 k = x
             else:
@@ -275,8 +275,8 @@ class GA:
             nodek = nodeManager.getNode(k)
             nodex = nodeManager.getNode(x)
             nodey = nodeManager.getNode(y)
-            dx = nodek.distanceTo(nodex)
-            dy = nodek.distanceTo(nodey)
+            dx = nodek.distance_to(nodex)
+            dy = nodek.distance_to(nodey)
             if dx < dy:
                 k = x
             else:

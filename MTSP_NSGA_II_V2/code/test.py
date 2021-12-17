@@ -6,6 +6,7 @@ from chromosome import Chromosome
 from GA import GA
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 def randomly_generate():
@@ -59,18 +60,18 @@ if __name__ == "__main__":
     generation = 200
     seedValue = 1
     tournamentSize = 2
-    mutationRate = 0.1
+    mutationRate = 0.2
 
-    filename = ["mtsp51", "mtsp100", "mtsp150", "pr76", "pr152", "pr226"]
-    # filename = ["mtsp51", "mtsp100"]
+    #filename = ["mtsp51", "mtsp100", "mtsp150", "pr76", "pr152", "pr226"]
+    filename = ["pr226"]
     solution_summary = {}
     solution_detail = {}
     for data_name in filename:
+        init(data_name, m, populationSize, coeOfDisCal, generation, seedValue, tournamentSize, mutationRate)
         path_solution = []
         optimal_solution = []
         run_time = []
-        for round in range(30):
-            init(data_name, m, populationSize, coeOfDisCal, generation, seedValue, tournamentSize, mutationRate)
+        for round in tqdm(range(10)):
             pop = [Chromosome(randomly_generate()) for i in range(0, gm.get_value("popSize"))]
             runtime, best, f1valbest, f2valbest, number, minfun1val_per_round, minfun2val_per_round = GA.start(pop)
             dis_list = []
@@ -87,6 +88,7 @@ if __name__ == "__main__":
                         "worst_solution": max(optimal_solution),
                         "average_solution:": np.array(optimal_solution).mean(),
                         "average_time": np.array(run_time).mean()}
+        #print(one_solution)
 
         detail_solution = {"all_solution": path_solution,
                            "best_solution": min(optimal_solution),
@@ -95,6 +97,6 @@ if __name__ == "__main__":
         solution_summary.update({data_name: one_solution})
         solution_detail.update({data_name: detail_solution})
     print(solution_summary)
-    print(solution_detail)
-    np.save('summary.npy', solution_summary)
-    np.save('summary_detail.npy', solution_detail)
+    #print(solution_detail)
+    #np.save('summary.npy', solution_summary)
+    #np.save('summary_detail.npy', solution_detail)

@@ -64,7 +64,7 @@ class chromosome:
             """ COUNT? """
 
             # distance calculations of pairwise cities
-            pdis = fromnode.distanceTo(tonode)
+            pdis = fromnode.distance_to(tonode)
             dis = dis + pdis
         self.distance = dis
         return dis

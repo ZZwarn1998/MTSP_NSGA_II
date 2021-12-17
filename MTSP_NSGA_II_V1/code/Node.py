@@ -15,8 +15,8 @@ class Node:
 
     # Returns distance to the Node
     def distanceTo(self, site):
-        xDis = abs(self.getX() - site.getX())
-        yDis = abs(self.getY() - site.getY())
+        xDis = abs(self.getX() - site.get_x())
+        yDis = abs(self.getY() - site.get_y())
         dis = math.sqrt((xDis * xDis) + (yDis * yDis))
         return dis
 
