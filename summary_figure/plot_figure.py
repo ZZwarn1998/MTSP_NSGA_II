@@ -20,6 +20,7 @@ def plot_figure(data_name, baseline_run_data, ours_run_data, start_generations):
 
 def plot_all_figure(baseline_run_data, ours_run_data, start_generations):
     fig = plt.figure(figsize=(20, 10))
+    plt.subplots_adjust(left=0.05, right=0.95, top=0.9, bottom=0.1)
     data_name = ["mtsp51", "mtsp100", "mtsp150", "pr76", "pr152", "pr226"]
     for i in range(6):
         fig.add_subplot(2, 3, i + 1)
