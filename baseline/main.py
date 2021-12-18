@@ -1,10 +1,9 @@
 from galogic import *
-import progressbar
 import time
 import nodenum as nn
 import json
-
-pbar = progressbar.ProgressBar()
+import os.path as osp
+import argparse
 
 
 def load_from_file(filepath):
@@ -22,12 +21,6 @@ def load_from_file(filepath):
             node_list.append((x, y))
     for i in node_list:
         RouteManager.addDustbin(Dustbin(i[0], i[1]))
-
-
-# fig = plt.figure()
-#
-# plt.plot(xaxis, yaxis, 'r-')
-# plt.show()
 
 
 def start(problem_path):
@@ -50,39 +43,47 @@ def start(problem_path):
     optimal_length = globalRoute.getDistance()
     optimal_path = globalRoute.to_list()
     optimal_per_round = yaxis
-
     return runtime, optimal_length, optimal_path, optimal_per_round
 
 
-if __name__ == "__main__":
+def run_and_save(root_path, problem_name, save_name):
+    problem_path = osp.join(root_path + "data", problem_name + '.txt')
+    save_path = osp.join(root_path, save_name)
+    if not osp.exists(save_path):
+        record_dict = {"mtsp51": {"run_time": [], "optimal_length": [], "optimal_path": [], "minfun2val_per_round": []},
+                       "mtsp100": {"run_time": [], "optimal_length": [], "optimal_path": [],
+                                   "minfun2val_per_round": []},
+                       "mtsp150": {"run_time": [], "optimal_length": [], "optimal_path": [],
+                                   "minfun2val_per_round": []},
+                       "pr76": {"run_time": [], "optimal_length": [], "optimal_path": [], "minfun2val_per_round": []},
+                       "pr152": {"run_time": [], "optimal_length": [], "optimal_path": [], "minfun2val_per_round": []},
+                       "pr226": {"run_time": [], "optimal_length": [], "optimal_path": [], "minfun2val_per_round": []}
+                       }
+        data = json.dumps(record_dict, indent=1)
+        with open(save_path, "w") as f:
+            f.write(data)
 
-    record_dict = {}
+    with open(save_path, 'r', encoding='UTF-8') as f:
+        record_dict = json.load(f)
 
-    #for data_name in ["mtsp51", "mtsp100", "mtsp150", "pr76", "pr152", "pr226"]:
-    for data_name in ["mtsp51", "mtsp100"]:
-        tmp_dict = {}
-        run_time_all = []
-        optimal_length_all = []
-        optimal_path_all = []
-        minfun1val_per_round_all = []
-
-        for i in range(2):
-            print(i)
-            path = "./data/" + data_name + ".txt"
-            runtime, optimal_length, optimal_path, minfun1val_per_round = start(path)
-            run_time_all.append(runtime)
-            optimal_length_all.append(optimal_length)
-            optimal_path_all.append(optimal_path)
-            minfun1val_per_round_all.append(minfun1val_per_round)
-        tmp_dict = {"run_time": run_time_all,
-                    "optimal_length": optimal_length_all,
-                    "optimal_path": optimal_path_all,
-                    "minfun2val_per_round": minfun1val_per_round_all}
-        record_dict.update({data_name: tmp_dict})
-    print(record_dict)
+    runtime, optimal_length, optimal_path, minfun1val_per_round = start(problem_path)
+    record_dict[problem_name]["run_time"].append(runtime)
+    record_dict[problem_name]["optimal_length"].append(optimal_length)
+    record_dict[problem_name]["optimal_path"].append(optimal_path)
+    record_dict[problem_name]["minfun2val_per_round"].append(minfun1val_per_round)
 
     data = json.dumps(record_dict, indent=1)
-    with open("./record_base.json", "w") as f:
+    with open(save_path, "w") as f:
         f.write(data)
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-r', help='root path, note that data dir must in root path', required=True)
+parser.add_argument('-p', help='problem name', required=True)
+parser.add_argument('-o', help='result json file name', required=True)
+args = parser.parse_args()
+if __name__ == "__main__":
+    try:
+        run_and_save(args.r, args.p, args.o)
+    except Exception as e:
+        print(e)

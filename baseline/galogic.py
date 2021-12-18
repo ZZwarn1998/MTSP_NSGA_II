@@ -60,7 +60,6 @@ class GA:
                 child.base[i] = parent1.base[i]
 
         for i in range(nn.get_node_num()):
-            print(len(parent2.base))
             if not (child.containsDustbin(parent2.base[i])):
                 for i1 in range(nn.get_node_num()):
                     if child.base[i1].checkNull():

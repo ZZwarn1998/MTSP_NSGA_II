@@ -31,5 +31,5 @@ if __name__ == "__main__":
         record_dict.update({data_name: tmp_dict})
 
     data = json.dumps(record_dict, indent=1)
-    with open("./record.json", "w") as f:
+    with open("./ours_run_data.json", "w") as f:
         f.write(data)

@@ -42,6 +42,6 @@ def route_lengths():
             a = random_range(numTrucks, upper)
     return a
 
-if __name__ == "__main__":
-    print(random_range(3,10))
 
+if __name__ == "__main__":
+    print(random_range(3, 10))
