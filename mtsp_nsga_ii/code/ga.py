@@ -9,23 +9,32 @@ import time
 
 class GA:
     """genetic algorithm class
+    The class to solve the mtsp problem, the core method of this class is the crossover and mutation methods,the solve()
+    methods use the process of NSGA-II to solve the problem.
 
     Reference:The population select algorithm in this class was mainly based on the NSGA-II:
     https://github.com/haris989/NSGA-II ;Most of the code was based on the arifield's work:
     https://github.com/ariefield/MTSP-Genetic
 
     Atrributes:
-
+        problem: A str that the specific problem to solve
+        num_travellers: A int that the num of travellers, in this project is 5
+        population_size: Int, num of population size, in this project is 100
+        generations: Int, num of generations when solve, in this project is 200
+        mutation_rate: Int, probability of mutation, in this prject is 0.2
+        node_manager: An instance of NodeManager class which manage the city nodes
+        num_citys: Int, the number of citys
     """
 
     def __init__(self, problem, num_travellers, population_size, generations, mutation_rate):
+        self.problem = problem
         self.num_travellers = num_travellers
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
         self.node_manager = NodeManager()
         # Load problem data
-        path = "..//data//" + problem + ".txt"
+        path = "..//data//" + self.problem + ".txt"
         file = open(path, 'r')
         n = -1
         for index, row in enumerate(file):
@@ -40,11 +49,15 @@ class GA:
         self.num_citys = n
 
     def solve(self):
-        '''
+        """Solve function to get the solution of the question,use the process of NSGA-II
 
         Returns:
+            runtime: float, the runtime of the GA algorithm
+            optimal_length: int, the minimize of the sum distance
+            optimal_path: list, the solution of the path
+            minfun1val_per_round: list,The optimal solution for each generation
 
-        '''
+        """
 
         def _find_index(num, val):
             for i in range(0, len(val)):
@@ -52,7 +65,7 @@ class GA:
                     return i
             return -1
 
-        p_t = [Chromosome(1, self.num_citys, self.num_travellers) for i in range(0, self.population_size)]
+        Pi = [Chromosome(1, self.num_citys, self.num_travellers) for i in range(0, self.population_size)]
         print("START!")
         start_time = time.time()
         best_chromo = []
@@ -62,10 +75,10 @@ class GA:
         for i in range(self.generations):
 
             # Obtain current best chromosome
-            f1val = [self.fitness_function_1(chromo) for chromo in p_t]
-            f2val = [self.fitness_function_2(chromo) for chromo in p_t]
+            f1val = [self.fitness_function_1(chromo) for chromo in Pi]
+            f2val = [self.fitness_function_2(chromo) for chromo in Pi]
             non_dominated_sorted_solution = fast_non_dominated_sort(f1val[:], f2val[:])
-            best_chromo = [p_t[i] for i in non_dominated_sorted_solution[0]]
+            best_chromo = [Pi[i] for i in non_dominated_sorted_solution[0]]
 
             # Record current minimal value of function1 and function2
             minfun1val_per_round.append(min(self.fitness_function_1(chromo) for chromo in best_chromo))
@@ -77,16 +90,16 @@ class GA:
                 crowding_distance_values.append(
                     crowding_distance(f1val[:], f2val[:], non_dominated_sorted_solution[i][:]))
 
-            # Add Qi to Ri (Ri = Pi U Qi)
-            r_t = p_t[:]
-            while len(r_t) != 2 * self.population_size:
+            # Add Pi to Ri (Ri = Pi U Qi)
+            Ri = Pi[:]
+            while len(Ri) != 2 * self.population_size:
                 a1 = random.randint(0, self.population_size - 1)
                 b1 = random.randint(0, self.population_size - 1)
-                r_t.append(self.generateChild(p_t[a1], p_t[b1]))
+                Ri.append(self.generateChild(Pi[a1], Pi[b1]))
 
             # Fast non-dominated sort
-            f1val2 = [self.fitness_function_1(r_t[i]) for i in range(0, 2 * self.population_size)]
-            f2val2 = [self.fitness_function_2(r_t[i]) for i in range(0, 2 * self.population_size)]
+            f1val2 = [self.fitness_function_1(Ri[i]) for i in range(0, 2 * self.population_size)]
+            f2val2 = [self.fitness_function_2(Ri[i]) for i in range(0, 2 * self.population_size)]
             non_dominated_sorted_Ri = fast_non_dominated_sort(f1val2[:], f2val2[:])
 
             # Calculate crowding distance values
@@ -116,7 +129,7 @@ class GA:
                 if len(indexOfPnext) == self.population_size:
                     break
 
-            p_t = [r_t[i] for i in indexOfPnext]
+            Pi = [Ri[i] for i in indexOfPnext]
 
         end_time = time.time()
         runtime = end_time - start_time
@@ -130,13 +143,14 @@ class GA:
 
         return runtime, optimal_length, optimal_path, minfun1val_per_round
 
-    def fitness_function_1(self, chromosome: Chromosome) -> int:
-        """
+    def fitness_function_1(self, chromosome: Chromosome):
+        """function to calulate the value of fitness type 1
 
         Args:
-            chromosome:
+            chromosome:Chromosome instance that to be calulate
 
         Returns:
+            The value of fitness function 1, note that this function expect to reduce the total sum diatance
 
         """
         totaldis = 0
@@ -151,12 +165,13 @@ class GA:
         return totaldis
 
     def fitness_function_2(self, chromosome: Chromosome) -> int:
-        """
+        """function to calulate the value of fitness type 2
 
         Args:
-            chromosome:
+            chromosome:Chromosome instance that to be calulate
 
         Returns:
+            The value of fitness function 2, note that this function expect to reduce the distance of each traveller
 
         """
         totaldis = 0
@@ -175,14 +190,38 @@ class GA:
 
         return max(salesmendis) - min(salesmendis)
 
-    def getCrossChildSeq(self, pa: Chromosome, pb: Chromosome) -> list:
-        """
-        
+    def generateChild(self, parent1: Chromosome, parent2: Chromosome):
+        """Generate a child by two parents
+        This function is to generate a new child by the crossover and mutation operate
+
         Args:
-            pa:
-            pb:
+            parent1: Chromosome, parents A to generate the child
+            parent2: Chromosome, parents B to generate the child
 
         Returns:
+            Chromosome, the child
+
+        """
+        mr = random.random()
+        childseq = self.getCrossChildSeq(parent1, parent2)
+        if mr < self.mutation_rate:
+            r = random.random()
+
+            if r > 0.5:
+                return Chromosome(0, self.mutation1(childseq), self.num_travellers)
+            else:
+                return Chromosome(0, self.mutation2(childseq), self.num_travellers)
+        return Chromosome(0, childseq, self.num_travellers)
+
+    def getCrossChildSeq(self, pa: Chromosome, pb: Chromosome) -> list:
+        """The function to do the crossover operate between two Chromosome
+        Note that after generate a child by crossover() we need to do rationalize
+        Args:
+            pa:Chromosome, parents A to do the crossover operate
+            pb:Chromosome, parents B to do the crossover operate
+
+        Returns:
+            Note that the return of this function is a list of child not Chomosome instance
 
         """
         PApart1 = copy.deepcopy(pa.getPart1())
@@ -202,6 +241,18 @@ class GA:
         return childseq
 
     def crossover(self, pa, pb, mark):
+        """The function to do the crossovere operate between two parents represented by list
+
+        Args:
+            pa: list, parent A to do the crossover
+            pb: list, parent B to do the crossover
+            mark: str, the search directions
+
+        Returns:
+            The result after crossover, list.
+
+        """
+
         def _latterCity(gene, k):
             i = (gene.index(k) + 1) % len(gene)
             return gene[i]
@@ -241,6 +292,18 @@ class GA:
 
     @classmethod
     def rationalize(cls, raw):
+        """Rationalize the crossover result
+        As the result by the crossover() may unreasonable, that is, for example: 0123004560, there are two
+        zeros linked together, this function is to fix this problem.
+
+        Args:
+            raw: List, the result after the crossver
+
+        Returns:
+            the list result after processing
+
+        """
+
         def _isValid(raw, i):
             if i + 2 >= len(raw):
                 return False
@@ -292,19 +355,16 @@ class GA:
 
         return raw
 
-    def generateChild(self, parent1, parent2):
-        mr = random.random()
-        childseq = self.getCrossChildSeq(parent1, parent2)
-        if mr < self.mutation_rate:
-            r = random.random()
-
-            if r > 0.5:
-                return Chromosome(0, self.mutation1(childseq), self.num_travellers)
-            else:
-                return Chromosome(0, self.mutation2(childseq), self.num_travellers)
-        return Chromosome(0, childseq, self.num_travellers)
-
     def mutation1(self, parent):
+        """Mutation operate type 1
+
+        Args:
+            parent: list
+
+        Returns:
+            The list of the result
+
+        """
         m = self.num_travellers
         n = len(parent)
         j = random.randint(1, n - (m - 1) - 1)
@@ -315,6 +375,7 @@ class GA:
         return part1 + part2
 
     def mutation2(self, parent):
+        """Mutation operate type 2"""
         m = self.num_travellers
         n = len(parent)
         j = random.randint(1, n - (m - 1) - 1)
@@ -325,10 +386,4 @@ class GA:
         return part1 + part2
 
 
-if __name__ == "__main__":
-    ga = GA("mtsp51", 5, 100, 200, 0.2)
-    print(ga.sort_by_val([1, 2], [1, 8, 4, 8]))
-    a = [1, 2]
-    b = [1, 8, 4, 8]
-    a = sorted(a, key=lambda x: b[x])
-    print(a)
+

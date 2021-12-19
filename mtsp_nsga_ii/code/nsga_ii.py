@@ -1,7 +1,21 @@
 import math
 
+"""
+The core algorithm of NSGA-II, note that this code is from https://github.com/haris989/NSGA-II
+"""
+
 
 def fast_non_dominated_sort(f1val, f2val):
+    """The implement fast non-dominated sort
+
+    Args:
+        f1val: list, The fitness function 1's values of all population
+        f2val: list, The fitness function 2's values of all population
+
+    Returns:
+        list, The final sorting result, from best to worst
+
+    """
     S = [[] for i in range(0, len(f1val))]
     front = [[]]
     n = [0 for i in range(0, len(f1val))]
@@ -49,6 +63,18 @@ def fast_non_dominated_sort(f1val, f2val):
 
 
 def crowding_distance(f1val, f2val, front):
+    """
+
+    Args:
+        f1val: list, The fitness function 1's values of all population
+        f2val: list, The fitness function 2's values of all population
+        front: The sort result by fast non-dominated sort
+
+    Returns:
+        list, the crowind_distance of elements in front
+    """
+
+
     distance = [0 for i in range(0, len(front))]
     sorted1 = sorted(front, key=lambda x: f1val[x])
     sorted2 = sorted(front, key=lambda x: f2val[x])

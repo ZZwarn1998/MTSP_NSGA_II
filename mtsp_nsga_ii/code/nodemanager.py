@@ -1,4 +1,5 @@
 class NodeManager:
+    """The class to manage the node"""
 
     def __init__(self):
         self.Nodes = []

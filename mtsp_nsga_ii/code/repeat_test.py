@@ -1,6 +1,8 @@
 from ga import GA
 import json
 
+"""This is the file to run repeat test experiment"""
+
 if __name__ == "__main__":
     problem_name_list = ["mtsp51", "mtsp100", "mtsp150", "pr76", "pr152", "pr226"]
     num_travellers = 5

@@ -2,6 +2,7 @@ import math
 
 
 class Node:
+    """The class of Node, this is from the baseline code"""
     # Constructor
     def __init__(self, x=None, y=None):
         self.x = x

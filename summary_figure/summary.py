@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import json
+from scipy import stats
 
 
 def summary_data(base_run_data, ous_run_data):
@@ -22,9 +23,18 @@ def summary_data(base_run_data, ous_run_data):
         print(df)
 
 
+def wilconxon_rank_test(run_data_1, run_data_2):
+    data_name = ["mtsp51", "mtsp100", "mtsp150", "pr76", "pr152", "pr226"]
+    for name in data_name:
+        optimal_solution_1 = run_data_1[name]["optimal_length"]
+        optimal_solution_2 = run_data_2[name]["optimal_length"]
+        print(stats.wilcoxon(optimal_solution_1, optimal_solution_2, alternative='two-sided'))
+
+
 if __name__ == "__main__":
     with open("baseline_run_data.json", 'r', encoding='UTF-8') as f:
         base = json.load(f)
     with open("ours_run_data.json", 'r', encoding='UTF-8') as f:
         ours = json.load(f)
-    summary_data(base, ours)
+    # summary_data(base, ours)
+    wilconxon_rank_test(base, ours)

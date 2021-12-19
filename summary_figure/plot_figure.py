@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def plot_figure(data_name, baseline_run_data, ours_run_data, start_generations):
     row_list = []
-    for summary in [(baseline_run_data, "baseline"), (ours_run_data, "ours")]:
+    for summary in [(baseline_run_data, "baseline"), (ours_run_data, "Improved")]:
         for round_data in summary[0][data_name]["minfun2val_per_round"]:
             for generation, obj in enumerate(round_data):
                 row_list.append([summary[1], generation + 1, obj])
