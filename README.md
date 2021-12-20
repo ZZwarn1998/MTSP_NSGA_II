@@ -1,13 +1,9 @@
 # The code of course project in Advanced Artificial Intelligence  
 
-<br/>This is the code of course project in Advanced Artificial Intelligence.This project uses ***NSGA-II*** to 
-solve the problem of ***Multiple Traveling Salesmen Problem***.<br/>
-The baseline code is from https://github.com/Anupal/GA-for-mTSP ,we have do some adjust to make it more suitable for our 
-experiment.<br/>
-The population select algorithm in our improve was mainly based on the NSGA-II:
-    https://github.com/haris989/NSGA-II ;most of the code was based on the arifield's work:
-    https://github.com/ariefield/MTSP-Genetic
-</br> 
+* This is the code of course project in Advanced Artificial Intelligence.This project uses ***NSGA-II*** to solve the problem of ***Multiple Traveling Salesmen Problem***.
+* The baseline code is from https://github.com/Anupal/GA-for-mTSP ,we have do some adjust to make it more suitable for our experiment.
+* The population select algorithm in our improve was mainly based on the NSGA-II:https://github.com/haris989/NSGA-II ;most of the code was based on the arifield's work:https://github.com/ariefield/MTSP-Genetic
+
 
 ## Contributors
 >The names of contributors are not in particular order.
@@ -20,7 +16,7 @@ The population select algorithm in our improve was mainly based on the NSGA-II:
 
 
 ## Operating instructions
-###1. Repeate our experiment result
+###Repeate our experiment result
  **Change** the dir to `baseline/code/`, and run the shell `repeat_test.sh`, 
  you will get the baseline result saved in the `baseline_run_data.json`<br/>
 **Change** the dir ro `mtsp_nsga_ii/code/`, and run the python file `repeat_test.py`,
